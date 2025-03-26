@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using System.Windows.Threading;
 using EdgeTTS;
 using Path = System.IO.Path;
 
@@ -12,11 +11,10 @@ namespace EdgeTTSTest;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private const string DefaultVoice = "zh-CN-XiaoxiaoNeural";
     private EdgeTTSEngine? _edgeTts;
     private readonly string _cacheFolder;
     private bool _isSpeaking;
-    private DateTime _lastConnectionTime = DateTime.Now;
-    private readonly TimeSpan _connectionTimeout = TimeSpan.FromMinutes(5); // 5分钟后重置连接
 
     public MainWindow()
     {
@@ -32,46 +30,15 @@ public partial class MainWindow : Window
         }
 
         InitializeTts();
-
         LoadVoices();
-
         TextToSpeech.Text = "测试TTS";
 
-        var connectionTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromSeconds(3)
-        };
-        connectionTimer.Tick += CheckConnection;
-        connectionTimer.Start();
+        // 设置滑块初始值显示
+        VolumeValueText.Text = ((int)VolumeSlider.Value).ToString();
+        SpeedValueText.Text = ((int)SpeedSlider.Value).ToString();
+        PitchValueText.Text = ((int)PitchSlider.Value).ToString();
 
         LogMessage("EdgeTTS测试应用已初始化完成");
-    }
-
-    private void CheckConnection(object? sender, EventArgs e)
-    {
-        if (_edgeTts == null) return;
-
-        // 如果超过设定的超时时间，重置连接
-        if (DateTime.Now - _lastConnectionTime > _connectionTimeout)
-        {
-            LogMessage("WebSocket连接可能已超时，正在重置连接...");
-            try
-            {
-                _edgeTts.Dispose();
-                _edgeTts = new EdgeTTSEngine(_cacheFolder, LogMessage);
-                _lastConnectionTime = DateTime.Now;
-                LogMessage("EdgeTTS引擎已重新初始化");
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"重置连接时出错: {ex.Message}");
-            }
-        }
-    }
-
-    private void UpdateConnectionTime()
-    {
-        _lastConnectionTime = DateTime.Now;
     }
 
     private void InitializeTts()
@@ -79,7 +46,6 @@ public partial class MainWindow : Window
         try
         {
             _edgeTts = new EdgeTTSEngine(_cacheFolder, LogMessage);
-            _lastConnectionTime = DateTime.Now;
             LogMessage("EdgeTTS引擎已初始化");
         }
         catch (Exception ex)
@@ -95,14 +61,14 @@ public partial class MainWindow : Window
 
         foreach (var voice in EdgeTTSEngine.Voices)
         {
-            var displayText = $"{voice}";
+            var displayText = $"{voice.DisplayName} ({voice.Value})";
             VoiceComboBox.Items.Add(displayText);
         }
 
         for (var i = 0; i < EdgeTTSEngine.Voices.Length; i++)
         {
             var voiceId = EdgeTTSEngine.Voices[i].ToString();
-            if (!voiceId.Contains("zh-CN-XiaoxiaoNeural")) continue;
+            if (!voiceId.Contains(DefaultVoice)) continue;
             VoiceComboBox.SelectedIndex = i;
             break;
         }
@@ -206,7 +172,6 @@ public partial class MainWindow : Window
                             await Task.Delay(1000);
                         }
 
-                        UpdateConnectionTime();
                         await _edgeTts.SpeakAsync(text, settings);
                         success = true;
                         LogMessage("朗读完成");
@@ -225,7 +190,6 @@ public partial class MainWindow : Window
                         // 重新初始化EdgeTTS引擎
                         _edgeTts.Dispose();
                         _edgeTts = new EdgeTTSEngine(_cacheFolder, LogMessage);
-                        UpdateConnectionTime();
                         LogMessage("EdgeTTS引擎已重新初始化");
                     }
                 }
@@ -244,7 +208,6 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             LogMessage($"SpeakButton_Click方法出错: {ex.Message}");
-            MessageBox.Show($"SpeakButton_Click方法出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -287,10 +250,9 @@ public partial class MainWindow : Window
                 var settings = CreateSettings();
                 LogMessage($"开始缓存文本音频 (语音: {settings.Voice}, 语速: {settings.Speed}, 音调: {settings.Pitch})");
 
-                // 添加重试逻辑
                 const int maxRetries = 3;
-                int retryCount = 0;
-                string audioFile = string.Empty;
+                var retryCount = 0;
+                var audioFile = string.Empty;
 
                 while (string.IsNullOrEmpty(audioFile) && retryCount < maxRetries)
                 {
@@ -302,7 +264,6 @@ public partial class MainWindow : Window
                             await Task.Delay(1000); // 重试前等待1秒
                         }
 
-                        UpdateConnectionTime(); // 更新连接时间
                         audioFile = await _edgeTts.GetAudioFileAsync(text, settings);
                         LogMessage($"音频缓存完成: {audioFile}");
                     }
@@ -320,7 +281,6 @@ public partial class MainWindow : Window
                         // 重新初始化EdgeTTS引擎
                         _edgeTts.Dispose();
                         _edgeTts = new EdgeTTSEngine(_cacheFolder, LogMessage);
-                        UpdateConnectionTime(); // 更新连接时间
                         LogMessage("EdgeTTS引擎已重新初始化");
                     }
                 }
@@ -344,31 +304,70 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             LogMessage($"CacheButton_Click方法出错: {ex.Message}");
-            MessageBox.Show($"CacheButton_Click方法出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
     private void ResetButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_edgeTts == null)
-        {
-            MessageBox.Show("EdgeTTS引擎未初始化", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
-        }
-
         try
         {
-            LogMessage("正在手动重置WebSocket连接...");
-            _edgeTts.Dispose();
-            _edgeTts = new EdgeTTSEngine(_cacheFolder, LogMessage);
-            _lastConnectionTime = DateTime.Now;
-            LogMessage("EdgeTTS引擎已重新初始化，WebSocket连接已重置");
-            MessageBox.Show("WebSocket连接已重置", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            // 重置所有设置到默认值
+            VolumeSlider.Value = 100;
+            SpeedSlider.Value = 100;
+            PitchSlider.Value = 100;
+
+            // 尝试重置为默认中文语音
+            var foundChineseVoice = false;
+            for (var i = 0; i < EdgeTTSEngine.Voices.Length; i++)
+            {
+                var voiceId = EdgeTTSEngine.Voices[i].ToString();
+                if (!voiceId.Contains(DefaultVoice)) continue;
+                VoiceComboBox.SelectedIndex = i;
+                foundChineseVoice = true;
+                break;
+            }
+            
+            if (!foundChineseVoice && VoiceComboBox.Items.Count > 0)
+            {
+                VoiceComboBox.SelectedIndex = 0;
+            }
+
+            // 重置TTS引擎
+            if (_edgeTts != null)
+            {
+                _edgeTts.Dispose();
+                _edgeTts = new EdgeTTSEngine(_cacheFolder, LogMessage);
+                LogMessage("EdgeTTS引擎已重新初始化");
+            }
+            else
+            {
+                InitializeTts();
+            }
+
+            LogMessage("所有设置已恢复默认值");
+            MessageBox.Show("所有设置已恢复默认值", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
-            LogMessage($"重置连接时出错: {ex.Message}");
-            MessageBox.Show($"重置连接时出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            LogMessage($"重置失败: {ex.Message}");
+        }
+    }
+
+    private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (!IsInitialized) return;
+
+        if (Equals(sender, VolumeSlider) && VolumeValueText != null)
+        {
+            VolumeValueText.Text = ((int)VolumeSlider.Value).ToString();
+        }
+        else if (Equals(sender, SpeedSlider) && SpeedValueText != null)
+        {
+            SpeedValueText.Text = ((int)SpeedSlider.Value).ToString();
+        }
+        else if (Equals(sender, PitchSlider) && PitchValueText != null)
+        {
+            PitchValueText.Text = ((int)PitchSlider.Value).ToString();
         }
     }
 }

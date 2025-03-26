@@ -10,10 +10,11 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="3*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="EdgeTTS 功能测试" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" />
@@ -35,33 +36,56 @@
                 <ComboBox Grid.Row="0" Grid.Column="1" x:Name="VoiceComboBox" Margin="0,5,10,5" SelectedIndex="0" />
 
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="音量:" VerticalAlignment="Center" Margin="0,0,5,0" />
-                <Slider Grid.Row="0" Grid.Column="3" x:Name="VolumeSlider" Minimum="0" Maximum="100" Value="100"
-                        VerticalAlignment="Center" Margin="0,5,0,5" />
+                <Grid Grid.Row="0" Grid.Column="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider Grid.Column="0" x:Name="VolumeSlider" Minimum="0" Maximum="100" Value="100"
+                            VerticalAlignment="Center" Margin="0,5,5,5" ValueChanged="Slider_ValueChanged" />
+                    <TextBlock Grid.Column="1" x:Name="VolumeValueText" Text="100" VerticalAlignment="Center" MinWidth="30" />
+                </Grid>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="语速:" VerticalAlignment="Center" Margin="0,0,5,0" />
-                <Slider Grid.Row="1" Grid.Column="1" x:Name="SpeedSlider" Minimum="0" Maximum="200" Value="100"
-                        VerticalAlignment="Center" Margin="0,5,10,5" />
+                <Grid Grid.Row="1" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider Grid.Column="0" x:Name="SpeedSlider" Minimum="0" Maximum="200" Value="100"
+                            VerticalAlignment="Center" Margin="0,5,5,5" ValueChanged="Slider_ValueChanged" />
+                    <TextBlock Grid.Column="1" x:Name="SpeedValueText" Text="100" VerticalAlignment="Center" MinWidth="30" />
+                </Grid>
 
                 <TextBlock Grid.Row="1" Grid.Column="2" Text="音调:" VerticalAlignment="Center" Margin="0,0,5,0" />
-                <Slider Grid.Row="1" Grid.Column="3" x:Name="PitchSlider" Minimum="0" Maximum="200" Value="100"
-                        VerticalAlignment="Center" Margin="0,5,0,5" />
+                <Grid Grid.Row="1" Grid.Column="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider Grid.Column="0" x:Name="PitchSlider" Minimum="0" Maximum="200" Value="100"
+                            VerticalAlignment="Center" Margin="0,5,5,5" ValueChanged="Slider_ValueChanged" />
+                    <TextBlock Grid.Column="1" x:Name="PitchValueText" Text="100" VerticalAlignment="Center" MinWidth="30" />
+                </Grid>
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="2" Header="要朗读的文本" Margin="0,0,0,10">
-            <TextBox x:Name="TextToSpeech" AcceptsReturn="True" TextWrapping="Wrap"
-                     Margin="5" />
-        </GroupBox>
-
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
             <Button x:Name="SpeakButton" Content="朗读文本" Width="100" Margin="5" Click="SpeakButton_Click" />
             <Button x:Name="StopButton" Content="停止朗读" Width="100" Margin="5" Click="StopButton_Click" />
             <Button x:Name="CacheButton" Content="缓存音频" Width="100" Margin="5" Click="CacheButton_Click" />
-            <Button x:Name="ResetButton" Content="重置连接" Width="100" Margin="5" Click="ResetButton_Click" />
+            <Button x:Name="ResetButton" Content="重置设置" Width="100" Margin="5" Click="ResetButton_Click" />
         </StackPanel>
 
-        <TextBlock Grid.Row="4" Text="日志:" Margin="0,0,0,5" />
-        <TextBox Grid.Row="5" x:Name="LogTextBox" MinHeight="120" MaxHeight="200" IsReadOnly="True"
-                 VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" />
+        <GroupBox Grid.Row="3" Header="要朗读的文本" MinHeight="100" Margin="0,0,0,10">
+            <TextBox x:Name="TextToSpeech" AcceptsReturn="True" TextWrapping="Wrap"
+                     Margin="5" />
+        </GroupBox>
+        
+        <TextBlock Grid.Row="5" Text="日志:" Margin="0,0,0,5" />
+        <TextBox Grid.Row="6" x:Name="LogTextBox" IsReadOnly="True"
+                 VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" 
+                 ScrollViewer.CanContentScroll="True" 
+                 ScrollViewer.VerticalScrollBarVisibility="Visible" />
     </Grid>
 </Window>
