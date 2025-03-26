@@ -14,7 +14,7 @@
             <RowDefinition Height="3*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="3*" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="EdgeTTS 功能测试" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" />
@@ -30,6 +30,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="语音:" VerticalAlignment="Center" Margin="0,0,5,0" />
@@ -43,7 +44,8 @@
                     </Grid.ColumnDefinitions>
                     <Slider Grid.Column="0" x:Name="VolumeSlider" Minimum="0" Maximum="100" Value="100"
                             VerticalAlignment="Center" Margin="0,5,5,5" ValueChanged="Slider_ValueChanged" />
-                    <TextBlock Grid.Column="1" x:Name="VolumeValueText" Text="100" VerticalAlignment="Center" MinWidth="30" />
+                    <TextBlock Grid.Column="1" x:Name="VolumeValueText" Text="100" VerticalAlignment="Center"
+                               MinWidth="30" />
                 </Grid>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="语速:" VerticalAlignment="Center" Margin="0,0,5,0" />
@@ -54,7 +56,8 @@
                     </Grid.ColumnDefinitions>
                     <Slider Grid.Column="0" x:Name="SpeedSlider" Minimum="0" Maximum="200" Value="100"
                             VerticalAlignment="Center" Margin="0,5,5,5" ValueChanged="Slider_ValueChanged" />
-                    <TextBlock Grid.Column="1" x:Name="SpeedValueText" Text="100" VerticalAlignment="Center" MinWidth="30" />
+                    <TextBlock Grid.Column="1" x:Name="SpeedValueText" Text="100" VerticalAlignment="Center"
+                               MinWidth="30" />
                 </Grid>
 
                 <TextBlock Grid.Row="1" Grid.Column="2" Text="音调:" VerticalAlignment="Center" Margin="0,0,5,0" />
@@ -65,8 +68,13 @@
                     </Grid.ColumnDefinitions>
                     <Slider Grid.Column="0" x:Name="PitchSlider" Minimum="0" Maximum="200" Value="100"
                             VerticalAlignment="Center" Margin="0,5,5,5" ValueChanged="Slider_ValueChanged" />
-                    <TextBlock Grid.Column="1" x:Name="PitchValueText" Text="100" VerticalAlignment="Center" MinWidth="30" />
+                    <TextBlock Grid.Column="1" x:Name="PitchValueText" Text="100" VerticalAlignment="Center"
+                               MinWidth="30" />
                 </Grid>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="输出设备:" VerticalAlignment="Center" Margin="0,0,5,0" />
+                <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" x:Name="AudioDeviceComboBox"
+                          Margin="0,5,0,5" SelectionChanged="AudioDeviceComboBox_SelectionChanged" />
             </Grid>
         </GroupBox>
 
@@ -81,11 +89,11 @@
             <TextBox x:Name="TextToSpeech" AcceptsReturn="True" TextWrapping="Wrap"
                      Margin="5" />
         </GroupBox>
-        
+
         <TextBlock Grid.Row="5" Text="日志:" Margin="0,0,0,5" />
         <TextBox Grid.Row="6" x:Name="LogTextBox" IsReadOnly="True"
-                 VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" 
-                 ScrollViewer.CanContentScroll="True" 
+                 VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                 ScrollViewer.CanContentScroll="True"
                  ScrollViewer.VerticalScrollBarVisibility="Visible" />
     </Grid>
 </Window>

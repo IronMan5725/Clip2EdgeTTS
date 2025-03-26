@@ -15,6 +15,8 @@ public partial class MainWindow : Window
     private EdgeTTSEngine? _edgeTts;
     private readonly string _cacheFolder;
     private bool _isSpeaking;
+    private int _currentAudioDeviceId;
+    private readonly List<AudioDevice> _audioDeviceList;
 
     public MainWindow()
     {
@@ -30,10 +32,15 @@ public partial class MainWindow : Window
         }
 
         InitializeTts();
+
+        _currentAudioDeviceId = EdgeTTSEngine.GetDefaultAudioDeviceId();
+        _audioDeviceList = EdgeTTSEngine.GetAudioDevices();
+        LoadAudioDevices();
+        LogMessage($"默认音频设备: {_currentAudioDeviceId}");
+
         LoadVoices();
         TextToSpeech.Text = "测试TTS";
 
-        // 设置滑块初始值显示
         VolumeValueText.Text = ((int)VolumeSlider.Value).ToString();
         SpeedValueText.Text = ((int)SpeedSlider.Value).ToString();
         PitchValueText.Text = ((int)PitchSlider.Value).ToString();
@@ -81,6 +88,42 @@ public partial class MainWindow : Window
         LogMessage($"已加载 {EdgeTTSEngine.Voices.Length} 个语音");
     }
 
+    private void LoadAudioDevices()
+    {
+        AudioDeviceComboBox.Items.Clear();
+
+        foreach (var device in _audioDeviceList)
+        {
+            AudioDeviceComboBox.Items.Add($"{device.Name} (ID: {device.Id})");
+        }
+
+        // 设置默认设备为选中项
+        for (var i = 0; i < _audioDeviceList.Count; i++)
+        {
+            if (_audioDeviceList[i].Id != _currentAudioDeviceId) continue;
+            AudioDeviceComboBox.SelectedIndex = i;
+            break;
+        }
+
+        if (AudioDeviceComboBox.SelectedIndex < 0 && AudioDeviceComboBox.Items.Count > 0)
+        {
+            AudioDeviceComboBox.SelectedIndex = 0;
+            _currentAudioDeviceId = _audioDeviceList[0].Id;
+        }
+
+        LogMessage($"已加载 {_audioDeviceList.Count} 个音频设备");
+    }
+
+    private void AudioDeviceComboBox_SelectionChanged(object sender,
+        System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (AudioDeviceComboBox.SelectedIndex < 0 ||
+            AudioDeviceComboBox.SelectedIndex >= _audioDeviceList.Count) return;
+        _currentAudioDeviceId = _audioDeviceList[AudioDeviceComboBox.SelectedIndex].Id;
+        LogMessage(
+            $"已选择音频设备: {_audioDeviceList[AudioDeviceComboBox.SelectedIndex].Name} (ID: {_currentAudioDeviceId})");
+    }
+
     private EdgeTTSSettings CreateSettings()
     {
         var selectedVoiceIndex = VoiceComboBox.SelectedIndex;
@@ -88,10 +131,11 @@ public partial class MainWindow : Window
 
         return new EdgeTTSSettings
         {
-            Voice = EdgeTTSEngine.Voices[selectedVoiceIndex].ToString(),
+            Voice = EdgeTTSEngine.Voices[selectedVoiceIndex].Value,
             Volume = (int)VolumeSlider.Value,
             Speed = (int)SpeedSlider.Value,
-            Pitch = (int)PitchSlider.Value
+            Pitch = (int)PitchSlider.Value,
+            AudioDeviceId = _currentAudioDeviceId
         };
     }
 
@@ -316,6 +360,19 @@ public partial class MainWindow : Window
             SpeedSlider.Value = 100;
             PitchSlider.Value = 100;
 
+            // 重置音频设备为默认设备
+            _currentAudioDeviceId = EdgeTTSEngine.GetDefaultAudioDeviceId();
+
+            // 选择默认音频设备
+            for (int i = 0; i < _audioDeviceList.Count; i++)
+            {
+                if (_audioDeviceList[i].Id == _currentAudioDeviceId)
+                {
+                    AudioDeviceComboBox.SelectedIndex = i;
+                    break;
+                }
+            }
+
             // 尝试重置为默认中文语音
             var foundChineseVoice = false;
             for (var i = 0; i < EdgeTTSEngine.Voices.Length; i++)
@@ -326,7 +383,7 @@ public partial class MainWindow : Window
                 foundChineseVoice = true;
                 break;
             }
-            
+
             if (!foundChineseVoice && VoiceComboBox.Items.Count > 0)
             {
                 VoiceComboBox.SelectedIndex = 0;
@@ -344,7 +401,7 @@ public partial class MainWindow : Window
                 InitializeTts();
             }
 
-            LogMessage("所有设置已恢复默认值");
+            LogMessage($"所有设置已恢复默认值，默认音频设备ID: {_currentAudioDeviceId}");
             MessageBox.Show("所有设置已恢复默认值", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
