@@ -4,6 +4,10 @@
 
 ![EdgeTTS测试应用界面](EdgeTTSTest.png)
 
+## Edge TTS 库
+
+由 AtmoOmen 修改的 ![Edge TTS](https://github.com/AtmoOmen/EdgeTTS)
+
 ## 工具介绍
 
 本工具主要用于测试和演示EdgeTTS库的功能，通过图形界面让您可以方便地调用EdgeTTS的各种API，无需编写代码。
