@@ -1,12 +1,12 @@
 # EdgeTTS
 
-### This is an interface testing tool for the EdgeTTS library to intuitively test and verify the various functions of EdgeTTS.
+#### This is an interface testing tool for the EdgeTTS library to intuitively test and verify the various functions of EdgeTTS.
 
 ![EdgeTTS Test Application Interface](EdgeTTSTest.png)
 
 ## Edge TTS 
 
-由 AtmoOmen Modified ![Edge TTS](https://github.com/AtmoOmen/EdgeTTS)
+by AtmoOmen Modified ![Edge TTS](https://github.com/AtmoOmen/EdgeTTS)
 
 ## Tool introduction
 
