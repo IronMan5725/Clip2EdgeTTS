@@ -1,85 +1,86 @@
 # EdgeTTS
 
-## This is an interface testing tool for the EdgeTTS library to intuitively test and verify the various functions of EdgeTTS.
+### This is an interface testing tool for the EdgeTTS library to intuitively test and verify the various functions of EdgeTTS.
 
-![EdgeTTS测试应用界面](EdgeTTSTest.png)
+![EdgeTTS Test Application Interface](EdgeTTSTest.png)
 
-## Edge TTS 库
+## Edge TTS 
 
-由 AtmoOmen 修改的 ![Edge TTS](https://github.com/AtmoOmen/EdgeTTS)
+由 AtmoOmen Modified ![Edge TTS](https://github.com/AtmoOmen/EdgeTTS)
 
-## 工具介绍
+## Tool introduction
 
-本工具主要用于测试和演示EdgeTTS库的功能，通过图形界面让您可以方便地调用EdgeTTS的各种API，无需编写代码。
+This tool is mainly used to test and demonstrate the functions of the EdgeTTS library. 
+Through the graphical interface, you can easily call various APIs of EdgeTTS without writing code。
 
-## EdgeTTS API 介绍
+## EdgeTTS API
 
-EdgeTTS库提供了以下主要API:
+EdgeTTS API:
 
-### 初始化
+### initialization
 
 ```csharp
-// 创建EdgeTTS引擎实例，指定缓存文件夹和日志回调
+// Create an EdgeTTS engine instance, specify cache folders and log callbacks
 _edgeTts = new EdgeTTSEngine(cacheFolder, LogCallback);
 ```
 
-### 语音合成与播放
+### Voice synthesis and playback
 
 ```csharp
-// 获取所有可用语音
+// Get all available voices
 EdgeTTSEngine.Voices
 
-// 异步朗读文本
+// Read text asynchronously
 await _edgeTts.SpeakAsync(text, settings);
 
-// 停止当前朗读
+// Stop reading
 _edgeTts.Stop();
 
-// 获取音频文件(缓存)
+// Get audio files (cache)
 string audioFile = await _edgeTts.GetAudioFileAsync(text, settings);
 ```
 
-### 音频设备
+### Voice synthesis and playback
 
 ```csharp
-// 获取系统默认音频设备ID
+//Get the system default audio device ID
 int defaultDeviceId = EdgeTTSEngine.GetDefaultAudioDeviceId();
 
-// 获取所有音频设备列表
+// Get a list of all audio devices
 List<AudioDevice> devices = EdgeTTSEngine.GetAudioDevices();
 ```
 
-### 设置选项
+### Setting options
 
 ```csharp
-// 创建TTS设置
+// Create TTS settings
 var settings = new EdgeTTSSettings
 {
-    Voice = "zh-CN-XiaoxiaoNeural",  // 语音
-    Volume = 100,                    // 音量 (0-100)
-    Speed = 100,                     // 语速 (0-200)
-    Pitch = 100,                     // 音调 (0-200)
-    AudioDeviceId = deviceId         // 音频输出设备ID
+    Voice = "zh-CN-XiaoxiaoNeural",  // voice
+    Volume = 100,                    // volume (0-100)
+    Speed = 100,                     // speed (0-200)
+    Pitch = 100,                     // tone (0-200)
+    AudioDeviceId = deviceId         // Audio output deviceID
 };
 ```
 
-### 资源释放
+### Resource release
 
 ```csharp
-// 释放资源
+// Free up resources
 _edgeTts.Dispose();
 ```
 
-## 测试工具功能
+## Test tool features
 
-- 语音选择与参数调整
-- 音频设备选择
-- 实时朗读文本
-- 音频缓存到文件
-- 详细日志记录
+- Voice selection and parameter adjustment
+- Audio device selection
+- Read text in real time
+- Audio cache to file
+- Detailed logging
 
-## 系统要求
+## System requirements
 
 - Windows 10/11
 - .NET 8.0+
-- 网络连接 
+- Network connection
