@@ -1,6 +1,6 @@
-# EdgeTTS 测试工具
+# EdgeTTS
 
-这是一个为EdgeTTS库提供的界面测试工具，用于直观地测试和验证EdgeTTS的各项功能。
+This is an interface testing tool for the EdgeTTS library to intuitively test and verify the various functions of EdgeTTS.
 
 ![EdgeTTS测试应用界面](EdgeTTSTest.png)
 
