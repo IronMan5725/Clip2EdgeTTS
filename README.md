@@ -2,7 +2,7 @@
 
 #### This is an interface testing tool for the EdgeTTS library to intuitively test and verify the various functions of EdgeTTS.
 
-![EdgeTTS Test Application Interface](EdgeTTSTest.png)
+![EdgeTTS Test Application Interface](EdgeTTSEng.png)
 
 ## Edge TTS 
 
