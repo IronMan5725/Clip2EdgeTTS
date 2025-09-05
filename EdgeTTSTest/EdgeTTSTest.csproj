@@ -1,28 +1,40 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0-windows</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <UseWPF>true</UseWPF>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>EdgeTTSTest</AssemblyName>
+    <RootNamespace>EdgeTTSTest</RootNamespace>
+  </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Reference to the local EdgeTTS library (built from source) -->
+    <Reference Include="EdgeTTS">
+      <HintPath>..\..\EdgeTTS\bin\Debug\net8.0-windows7.0\EdgeTTS.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+
+    <!-- Required NuGet packages -->
+    <PackageReference Include="System.Net.WebSockets.Client.Managed" Version="1.0.22" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    
+  </ItemGroup>
+
+  <!-- Copy EdgeTTS dependencies (DLLs) to output directory after build -->
+  <Target Name="CopyEdgeTTSDependencies" AfterTargets="Build" Condition="Exists('..\..\EdgeTTS\bin\Debug\net8.0-windows7.0')">
     <ItemGroup>
-        <Reference Include="EdgeTTS">
-            <HintPath>..\..\EdgeTTS\bin\Debug\net8.0-windows7.0\EdgeTTS.dll</HintPath>
-            <Private>true</Private>
-        </Reference>
-        <PackageReference Include="System.Net.WebSockets.Client.Managed" Version="1.0.22"/>
-        <PackageReference Include="NAudio" Version="2.2.1"/>
+      <EdgeTTSDependencies Include="..\..\EdgeTTS\bin\Debug\net8.0-windows7.0\*.dll" />
     </ItemGroup>
-
-    <!-- 复制EdgeTTS依赖项到输出目录 -->
-    <Target Name="CopyEdgeTTSDependencies" AfterTargets="Build">
-        <ItemGroup>
-            <EdgeTTSDependencies Include="..\..\EdgeTTS\bin\Debug\net8.0-windows7.0\*.dll"/>
-        </ItemGroup>
-        <Copy SourceFiles="@(EdgeTTSDependencies)" DestinationFolder="$(OutDir)"/>
-    </Target>
+    <Copy
+      SourceFiles="@(EdgeTTSDependencies)"
+      DestinationFolder="$(OutDir)"
+      SkipUnchangedFiles="true"
+      OverwriteReadOnlyFiles="true"
+    />
+    <Message Text="Copied EdgeTTS dependencies to $(OutDir)" Importance="high" />
+  </Target>
 
 </Project>
